@@ -188,5 +188,6 @@ if __name__ == "__main__":
 
     rnd = np.random.randint(0, 1000000)
     setup_logger(os.path.join('CQL_offline_mujoco_runs', str(rnd)), variant=variant, base_log_dir='/nfs/kun1/users/aviralkumar/random_expert_CQL_runs')
-    ptu.set_gpu_mode(True)
-    experiment(variant)
+    ptu.set_gpu_mode(True)d
+    experiment(variantd
+// test this line
