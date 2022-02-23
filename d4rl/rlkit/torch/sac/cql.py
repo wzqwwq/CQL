@@ -104,23 +104,23 @@ class CQLTrainer(TorchTrainer):
         self._need_to_update_eval_statistics = True
         self.policy_eval_start = policy_eval_start  # in first few epochs:BC
         
-        self._current_epoch = 0
-        self._policy_update_ctr = 0
-        self._num_q_update_steps = 0
-        self._num_policy_update_steps = 0
-        self._num_policy_steps = 1
+        self._current_epoch = 0    # global variables
+        self._policy_update_ctr = 0   # seems useless
+        self._num_q_update_steps = 0   # count qf update times
+        self._num_policy_update_steps = 0   # count policy updates
+        self._num_policy_steps = 1   # seems useless
         
-        self.num_qs = num_qs
+        self.num_qs = num_qs    # num of qf
 
         ## min Q
         self.temp = temp
-        self.min_q_version = min_q_version
-        self.min_q_weight = min_q_weight
+        self.min_q_version = min_q_version    # CQL(H)-3 or CQL(R)-2
+        self.min_q_weight = min_q_weight   # value of alpha
 
         self.softmax = torch.nn.Softmax(dim=1)
         self.softplus = torch.nn.Softplus(beta=self.temp, threshold=20)
 
-        self.max_q_backup = max_q_backup
+        self.max_q_backup = max_q_backup    # default is false
         self.deterministic_backup = deterministic_backup
         self.num_random = num_random
 
@@ -179,7 +179,7 @@ class CQLTrainer(TorchTrainer):
                 self.qf2(obs, new_obs_actions),
             )
 
-        policy_loss = (alpha*log_pi - q_new_actions).mean()
+        policy_loss = (alpha*log_pi - q_new_actions).mean()   # SAC p5-equa12
 
         if self._current_epoch < self.policy_eval_start:
             """
@@ -214,7 +214,7 @@ class CQLTrainer(TorchTrainer):
                 )
             
             if not self.deterministic_backup:
-                target_q_values = target_q_values - alpha * new_log_pi
+                target_q_values = target_q_values - alpha * new_log_pi 
         
         if self.max_q_backup:
             """when using max q backup"""
@@ -226,7 +226,7 @@ class CQLTrainer(TorchTrainer):
         q_target = self.reward_scale * rewards + (1. - terminals) * self.discount * target_q_values
         q_target = q_target.detach()
             
-        qf1_loss = self.qf_criterion(q1_pred, q_target)
+        qf1_loss = self.qf_criterion(q1_pred, q_target)   
         if self.num_qs > 1:
             qf2_loss = self.qf_criterion(q2_pred, q_target)
 
