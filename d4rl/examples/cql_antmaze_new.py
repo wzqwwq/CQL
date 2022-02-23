@@ -18,7 +18,7 @@ def load_hdf5(dataset, replay_buffer):
     replay_buffer._observations = dataset['observations']
     replay_buffer._next_obs = dataset['next_observations']
     replay_buffer._actions = dataset['actions']
-    # Center reward for Ant-Maze
+    # Center reward for Ant-Maze, different from mujoco
     replay_buffer._rewards = (np.expand_dims(dataset['rewards'], 1) - 0.5)*4.0   
     replay_buffer._terminals = np.expand_dims(dataset['terminals'], 1)  
     replay_buffer._size = dataset['terminals'].shape[0]
@@ -74,11 +74,12 @@ def experiment(variant):
         variant['replay_buffer_size'],
         expl_env,
     )
+    //choose dataset different
     if variant['load_buffer'] and buffer_filename is not None:
         replay_buffer.load_buffer(buffer_filename)
     else:
         load_hdf5(d4rl.qlearning_dataset(eval_env), replay_buffer)
-       
+  
     trainer = CQLTrainer(
         env=eval_env,
         policy=policy,
@@ -160,12 +161,12 @@ if __name__ == "__main__":
     parser.add_argument("--gpu", default='0', type=str)
     parser.add_argument("--max_q_backup", type=str, default="False")          # if we want to try max_{a'} backups, set this to true
     parser.add_argument("--deterministic_backup", type=str, default="True")   # defaults to true, it does not backup entropy in the Q-function, as per Equation 3
-    parser.add_argument("--policy_eval_start", default=40000, type=int)       # Defaulted to 20000 (40000 or 10000 work similarly)
+    parser.add_argument("--policy_eval_start", default=40000, type=int)       # Defaulted to 20000 (40000 or 10000 work similarly)  inital epochs, do BC
     parser.add_argument('--min_q_weight', default=1.0, type=float)            # the value of alpha, set to 5.0 or 10.0 if not using lagrange
     parser.add_argument('--policy_lr', default=1e-4, type=float)              # Policy learning rate
     parser.add_argument('--min_q_version', default=3, type=int)               # min_q_version = 3 (CQL(H)), version = 2 (CQL(rho)) 
     parser.add_argument('--lagrange_thresh', default=5.0, type=float)         # the value of tau, corresponds to the CQL(lagrange) version
-    parser.add_argument('--seed', default=10, type=int)
+    parser.add_argument('--seed', default=10, type=int) # Seed for random number generators.
 
     args = parser.parse_args()
     # enable_gpus(args.gpu)
@@ -174,7 +175,7 @@ if __name__ == "__main__":
     variant['trainer_kwargs']['min_q_weight'] = args.min_q_weight
     variant['trainer_kwargs']['policy_lr'] = args.policy_lr
     variant['trainer_kwargs']['min_q_version'] = args.min_q_version
-    variant['trainer_kwargs']['temp'] = 1.0
+    variant['trainer_kwargs']['temp'] = 1.0 // additional argument 
     variant['trainer_kwargs']['policy_eval_start'] = args.policy_eval_start
     variant['trainer_kwargs']['lagrange_thresh'] = args.lagrange_thresh
     if args.lagrange_thresh < 0.0:

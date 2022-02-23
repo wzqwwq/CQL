@@ -18,6 +18,7 @@ def load_hdf5(dataset, replay_buffer):
     replay_buffer._observations = dataset['observations']
     replay_buffer._next_obs = dataset['next_observations']
     replay_buffer._actions = dataset['actions']
+    # center reward different
     replay_buffer._rewards = np.expand_dims(np.squeeze(dataset['rewards']), 1)
     replay_buffer._terminals = np.expand_dims(np.squeeze(dataset['terminals']), 1)  
     replay_buffer._size = dataset['terminals'].shape[0]
@@ -73,6 +74,7 @@ def experiment(variant):
         variant['replay_buffer_size'],
         expl_env,
     )
+    # choose dataset different
     if variant['load_buffer'] and buffer_filename is not None:
         replay_buffer.load_buffer(buffer_filename)
     elif 'random-expert' in variant['env_name']:
@@ -187,7 +189,7 @@ if __name__ == "__main__":
     variant['seed'] = args.seed
 
     rnd = np.random.randint(0, 1000000)
-    setup_logger(os.path.join('CQL_offline_mujoco_runs', str(rnd)), variant=variant, base_log_dir='/nfs/kun1/users/aviralkumar/random_expert_CQL_runs')
-    ptu.set_gpu_mode(True)d
-    experiment(variantd
-// test this line
+    setup_logger(os.path.join('CQL_offline_mujoco_runs', str(rnd)), variant=variant, base_log_dir='./random_expert_CQL_runs')
+    ptu.set_gpu_mode(True)
+    experiment(variant)
+# test this line

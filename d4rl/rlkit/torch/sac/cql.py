@@ -14,39 +14,39 @@ class CQLTrainer(TorchTrainer):
     def __init__(
             self, 
             env,
-            policy,
-            qf1,
+            policy, # policy network
+            qf1,  # two Q-function, (SAC p15 makes use of two Q-functions to mitigate positive bias)
             qf2,
-            target_qf1,
+            target_qf1,  # two target Q-function
             target_qf2,
 
-            discount=0.99,
-            reward_scale=1.0,
+            discount=0.99, # \gamma ?
+            reward_scale=1.0, # q_target=scale*reward+...
 
-            policy_lr=1e-3,
-            qf_lr=1e-3,
-            optimizer_class=optim.Adam,
+            policy_lr=1e-3,  # policy learning rate
+            qf_lr=1e-3, # Q-function lr
+            optimizer_class=optim.Adam, 
 
             soft_target_tau=1e-2,
-            plotter=None,
-            render_eval_paths=False,
+            plotter=None,  # seem useless
+            render_eval_paths=False, # seem useless
 
             use_automatic_entropy_tuning=True,
-            target_entropy=None,
-            policy_eval_start=0,
-            num_qs=2,
+            target_entropy=None,  # entropy tuning
+            policy_eval_start=0,  # inital few epochs, do BC
+            num_qs=2, # num of Q-function, 1 or 2
 
             # CQL
-            min_q_version=3,
+            min_q_version=3,  # 3-CQL(H); 2-CQL(rho)
             temp=1.0,
-            min_q_weight=1.0,
+            min_q_weight=1.0,  # value of alpha
 
             ## sort of backup
-            max_q_backup=False,
-            deterministic_backup=True,
-            num_random=10,
+            max_q_backup=False, # ?theorem3.4, more robust to estimate error in online RL
+            deterministic_backup=True, # defaults to true, it does not backup entropy in the Q-function, as per Equation 3
+            num_random=10,  # get how many actions from policy
             with_lagrange=False,
-            lagrange_thresh=0.0,
+            lagrange_thresh=0.0,  # tau of CQL(lagrange), in equation(30); threshold -> adjust alpha
     ):
         super().__init__()
         self.env = env
@@ -149,7 +149,7 @@ class CQLTrainer(TorchTrainer):
     def train_from_torch(self, batch):
         self._current_epoch += 1
         rewards = batch['rewards']
-        terminals = batch['terminals']
+        terminals = batch['terminals']. # dataset terminals
         obs = batch['observations']
         actions = batch['actions']
         next_obs = batch['next_observations']
@@ -269,7 +269,7 @@ class CQLTrainer(TorchTrainer):
         
         if self.with_lagrange:
             alpha_prime = torch.clamp(self.log_alpha_prime.exp(), min=0.0, max=1000000.0)
-            min_qf1_loss = alpha_prime * (min_qf1_loss - self.target_action_gap)
+            min_qf1_loss = alpha_prime * (min_qf1_loss - self.target_action_gap)  # target_action_gap=threshold
             min_qf2_loss = alpha_prime * (min_qf2_loss - self.target_action_gap)
 
             self.alpha_prime_optimizer.zero_grad()
