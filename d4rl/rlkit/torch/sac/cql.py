@@ -27,7 +27,7 @@ class CQLTrainer(TorchTrainer):
             qf_lr=1e-3, # Q-function lr
             optimizer_class=optim.Adam, 
 
-            soft_target_tau=1e-2,
+            soft_target_tau=1e-2, # SAC parameter, target smoothing coefficient
             plotter=None,  # seem useless
             render_eval_paths=False, # seem useless
 
@@ -100,9 +100,9 @@ class CQLTrainer(TorchTrainer):
         self.discount = discount
         self.reward_scale = reward_scale
         self.eval_statistics = OrderedDict()
-        self._n_train_steps_total = 0
+        self._n_train_steps_total = 0   # total train steps
         self._need_to_update_eval_statistics = True
-        self.policy_eval_start = policy_eval_start
+        self.policy_eval_start = policy_eval_start  # in first few epochs:BC
         
         self._current_epoch = 0
         self._policy_update_ctr = 0

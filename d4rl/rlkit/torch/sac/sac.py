@@ -79,7 +79,7 @@ class SACTrainer(TorchTrainer):
         self.discount = discount
         self.reward_scale = reward_scale
         self.eval_statistics = OrderedDict()
-        self._n_train_steps_total = 0
+        self._n_train_steps_total = 0. # count steps for soft update
         self._need_to_update_eval_statistics = True
 
     def train_from_torch(self, batch):

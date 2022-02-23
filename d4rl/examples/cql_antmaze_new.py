@@ -74,7 +74,7 @@ def experiment(variant):
         variant['replay_buffer_size'],
         expl_env,
     )
-    //choose dataset different
+    #choose dataset different
     if variant['load_buffer'] and buffer_filename is not None:
         replay_buffer.load_buffer(buffer_filename)
     else:
@@ -121,11 +121,11 @@ if __name__ == "__main__":
         sparse_reward=False,
         algorithm_kwargs=dict(
             num_epochs=3000,
-            num_eval_steps_per_epoch=1000,
+            num_eval_steps_per_epoch=1000,  # used in path collector.collect_new_paths
             num_trains_per_train_loop=1000,  
             num_expl_steps_per_train_loop=1000,
             min_num_steps_before_training=1000,
-            max_path_length=1000,
+            max_path_length=1000,  # path collector.collect_new_paths, (s,a,r,s') counted as one
             batch_size=256,
         ),
         trainer_kwargs=dict(

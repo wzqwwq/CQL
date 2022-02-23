@@ -115,6 +115,7 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
             self.replay_buffer.add_paths(init_expl_paths)
             self.expl_data_collector.end_epoch(-1)
 
+        # epoch loop
         for epoch in gt.timed_for(
                 range(self._start_epoch, self.num_epochs),
                 save_itrs=True,
@@ -130,13 +131,15 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
                     discard_incomplete_paths=True
                 )
             else:
+                # evaluation collector
                 self.eval_data_collector.collect_new_paths(
-                    self.max_path_length,
+                    self.max_path_length,  # seems the 2 args is the same?
                     self.num_eval_steps_per_epoch,
                     discard_incomplete_paths=True,
                 )
             gt.stamp('evaluation sampling')
 
+            # loop in one epoch
             for _ in range(self.num_train_loops_per_epoch):
                 if not self.batch_rl:
                     # Sample new paths only if not doing batch rl
@@ -151,30 +154,31 @@ class BatchRLAlgorithm(BaseRLAlgorithm, metaclass=abc.ABCMeta):
                     gt.stamp('data storing', unique=False)
                 elif self.eval_both:
                     # Now evaluate the policy here:
-                    policy_fn = self.policy_fn
+                    policy_fn = self.policy_fn # a function to sample using max qf1
                     if self.trainer.discrete:
                         policy_fn = self.policy_fn_discrete
                     new_expl_paths = self.expl_data_collector.collect_new_paths(
-                        policy_fn,
+                        policy_fn,  # use the given policy
                         self.max_path_length,
                         self.num_eval_steps_per_epoch,
                         discard_incomplete_paths=True,
                     )
 
-                    gt.stamp('policy fn evaluation')
+                    gt.stamp('policy fn evaluation') # fn means?
 
-                self.training_mode(True)
+                self.training_mode(True) # turn on train mode
                 for _ in range(self.num_trains_per_train_loop):
                     train_data = self.replay_buffer.random_batch(
                         self.batch_size)
-                    self.trainer.train(train_data)
+                    self.trainer.train(train_data). # here in CQL trainer
                 gt.stamp('training', unique=False)
                 self.training_mode(False)
 
             self._end_epoch(epoch)
 
+            # # uncomment to turn on visualize
             # import ipdb; ipdb.set_trace()
-            ## After epoch visualize
+            # # After epoch visualize
             # if epoch % 50 == 0:
             #     self._visualize(policy=True, num_dir=300, alpha=0.05, iter=epoch)
             #     print ('Saved Plots ..... %d'.format(epoch))
