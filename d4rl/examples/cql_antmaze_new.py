@@ -175,7 +175,7 @@ if __name__ == "__main__":
     variant['trainer_kwargs']['min_q_weight'] = args.min_q_weight
     variant['trainer_kwargs']['policy_lr'] = args.policy_lr
     variant['trainer_kwargs']['min_q_version'] = args.min_q_version
-    variant['trainer_kwargs']['temp'] = 1.0 // additional argument 
+    variant['trainer_kwargs']['temp'] = 1.0 # additional argument 
     variant['trainer_kwargs']['policy_eval_start'] = args.policy_eval_start
     variant['trainer_kwargs']['lagrange_thresh'] = args.lagrange_thresh
     if args.lagrange_thresh < 0.0:

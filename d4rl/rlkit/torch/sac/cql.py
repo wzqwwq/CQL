@@ -149,7 +149,7 @@ class CQLTrainer(TorchTrainer):
     def train_from_torch(self, batch):
         self._current_epoch += 1
         rewards = batch['rewards']
-        terminals = batch['terminals']. # dataset terminals
+        terminals = batch['terminals']  # dataset terminals
         obs = batch['observations']
         actions = batch['actions']
         next_obs = batch['next_observations']
