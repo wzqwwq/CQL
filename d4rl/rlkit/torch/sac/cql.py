@@ -43,7 +43,7 @@ class CQLTrainer(TorchTrainer):
 
             ## sort of backup
             max_q_backup=False, # ?theorem3.4, more robust to estimate error in online RL
-            deterministic_backup=True, # defaults to true, it does not backup entropy in the Q-function, as per Equation 3
+            deterministic_backup=True, # (False in task config) it does not backup entropy in the Q-function, as per Equation 3
             num_random=10,  # get how many actions from policy
             with_lagrange=False,
             lagrange_thresh=0.0,  # tau of CQL(lagrange), in equation(30); threshold -> adjust alpha
